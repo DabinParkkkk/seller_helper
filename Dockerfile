@@ -3,7 +3,7 @@ FROM eclipse-temurin:21-jdk AS build
 WORKDIR /app
 
 COPY seller_helper/pom.xml pom.xml
-COPY seller_helper/src src
+COPY seller_helper/src
 
 RUN ./mvnw -e -X -DskipTests package
 
