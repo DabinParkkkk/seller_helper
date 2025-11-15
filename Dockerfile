@@ -1,11 +1,14 @@
+# ---- Build Stage ----
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
 
-COPY seller_helper/pom.xml ./pom.xml
-COPY seller_helper/src ./src
+# 현재 폴더에 pom.xml, src가 바로 있음
+COPY pom.xml .
+COPY src ./src
 
 RUN mvn -e -X -DskipTests package
 
+# ---- Run Stage ----
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 

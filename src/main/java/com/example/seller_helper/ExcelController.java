@@ -2,8 +2,8 @@ package com.example.seller_helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.http.HttpHeaders;
 
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
