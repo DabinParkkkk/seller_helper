@@ -2,8 +2,8 @@ package com.example.seller_helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.net.http.HttpHeaders;
 
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +34,7 @@ public class ExcelController {
                 .body(bytes);
     }
 
-    // ✅ CJ (지금은 한진과 동일 로직 사용, 나중에 ExcelService.convertCj 바꿔서 CJ 양식 맞추면 됨)
+    // ✅ CJ
     @PostMapping("/cj")
     public ResponseEntity<byte[]> convertCj(@RequestParam("file") MultipartFile file) throws IOException {
         ByteArrayInputStream converted = excelService.convertCj(file);
