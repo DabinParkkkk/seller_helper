@@ -2,11 +2,15 @@ package com.example.seller_helper;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
 import org.apache.poi.ss.usermodel.CellType;
@@ -275,4 +279,60 @@ public class ExcelService {
 
         public CustomMapping() {} // Jackson용 기본 생성자
     }
+
+
+// =========================
+//  쿠팡 + 한진 매칭 기능
+// =========================
+public ByteArrayInputStream matchHanjinWithCoupang(
+        File coupangFile, MultipartFile hanjinFile) throws IOException, InvalidFormatException {
+
+    Workbook coupangWb = new XSSFWorkbook(coupangFile);
+    Sheet coupangSheet = coupangWb.getSheetAt(0);
+
+    Workbook hanjinWb = new XSSFWorkbook(hanjinFile.getInputStream());
+    Sheet hanjinSheet = hanjinWb.getSheetAt(0);
+
+    Map<String, String> hanjinMap = new HashMap<>();
+
+    // 한진 파일 읽기
+    for (Row row : hanjinSheet) {
+        if (row.getRowNum() == 0) continue;
+
+        String name = getCellStringValue(row.getCell(19));  // T열 index 19
+        String product = getCellStringValue(row.getCell(41)); // AP열 index 41
+        String zipcode = getCellStringValue(row.getCell(25)); // Z열 index 25
+        String tracking = getCellStringValue(row.getCell(3)); // D열 index 3
+
+        if (name.isBlank() || product.isBlank() || zipcode.isBlank()) continue;
+
+        String key = name + "|" + product + "|" + zipcode;
+        hanjinMap.put(key, tracking);
+    }
+
+    // 쿠팡 파일에 운송장번호 삽입
+    for (Row row : coupangSheet) {
+        if (row.getRowNum() == 0) continue;
+
+        String name = getCellStringValue(row.getCell(26));   // AA
+        String product = getCellStringValue(row.getCell(12)); // M
+        String zipcode = getCellStringValue(row.getCell(28)); // AC
+
+        String key = name + "|" + product + "|" + zipcode;
+
+        if (hanjinMap.containsKey(key)) {
+            Cell cell = row.getCell(4); // E열
+            if (cell == null) cell = row.createCell(4);
+            cell.setCellValue(hanjinMap.get(key));
+        }
+    }
+
+    ByteArrayOutputStream out = new ByteArrayOutputStream();
+    coupangWb.write(out);
+
+    coupangWb.close();
+    hanjinWb.close();
+
+    return new ByteArrayInputStream(out.toByteArray());
+}
 }
