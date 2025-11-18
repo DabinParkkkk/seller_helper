@@ -1,4 +1,4 @@
-package com.example.seller_helper;
+package com.example.seller_helper.controller;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.example.seller_helper.service.MatchService;
+
 @RestController
 @RequestMapping("/match")
 public class MatchController {
@@ -21,6 +23,7 @@ public class MatchController {
         this.matchService = matchService;
     }
 
+    @SuppressWarnings("null")
     @PostMapping("/hanjin")
     public ResponseEntity<byte[]> matchHanjin(
             @RequestParam("coupang") MultipartFile coupangFile,

@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>회원가입 | Seller Helper</title>
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: #f8f9fa;
+            text-align: center;
+        }
+
+        .appbar {
+            width: 100%;
+            height: 60px;
+            background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 999;
+        }
+
+        .appbar-logo img { height: 35px; }
+
+        .appbar-menu a {
+            font-size: 15px;
+            text-decoration: none;
+            color: #444;
+            margin-left: 12px;
+            font-weight: 600;
+        }
+
+        .content-wrap {
+            margin-top: 110px;
+        }
+
+        .card {
+            margin: 0 auto;
+            background: white;
+            width: 380px;
+            padding: 40px 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+
+        input {
+            width: 90%;
+            padding: 12px;
+            margin: 10px 0;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 15px;
+        }
+
+        button {
+            width: 94%;
+            padding: 12px;
+            background: #f6d860;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: #e6c850;
+        }
+
+        .message {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #444;
+        }
+    </style>
+</head>
+<body>
+
+<div class="appbar">
+    <div class="appbar-logo">
+        <img src="logo.png">
+    </div>
+
+    <div class="appbar-menu">
+        <a href="login.html">로그인</a>
+        <a href="signup.html">회원가입</a>
+    </div>
+</div>
+
+<div class="content-wrap">
+    <div class="card">
+        <h2>회원가입</h2>
+
+        <input id="email" type="email" placeholder="이메일 입력">
+        <input id="password" type="password" placeholder="비밀번호 입력">
+
+        <button id="signupBtn">회원가입</button>
+
+        <div class="message" id="msg"></div>
+    </div>
+</div>
+
+<script>
+    const msg = document.getElementById("msg");
+    document.getElementById("signupBtn").addEventListener("click", async () => {
+
+        const email = document.getElementById("email").value.trim();
+        const password = document.getElementById("password").value.trim();
+
+        if (!email || !password) {
+            msg.innerText = "⚠ 이메일과 비밀번호를 모두 입력해주세요.";
+            return;
+        }
+
+        const response = await fetch("/auth/signup", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({email, password})
+        });
+
+        if (response.ok) {
+            msg.innerText = "✅ 회원가입 성공! 로그인 페이지로 이동합니다.";
+            setTimeout(() => {
+                window.location.href = "login.html";
+            }, 1200);
+        } else {
+            msg.innerText = "❌ 이미 존재하는 이메일입니다.";
+        }
+    });
+</script>
+
+</body>
+</html>
