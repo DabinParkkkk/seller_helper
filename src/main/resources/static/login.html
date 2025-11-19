@@ -34,24 +34,17 @@ async function login(){
     const res = await fetch("/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: email, password: password })
+        body: JSON.stringify({ email, password })
     });
 
-    const text = await res.text();
+    const token = await res.text();
 
-    // 에러 메시지인 경우
-    if (
-        text.includes("존재하지 않는") ||
-        text.includes("비밀번호") ||
-        text.includes("error")
-    ) {
-        document.getElementById("result").innerHTML = text;
-        return;
+    if (token.startsWith("ey")) { // JWT 토큰 여부
+        localStorage.setItem("token", token);  // 로그인 상태 저장
+        window.location.href = "/index.html";  // 메인으로 이동
+    } else {
+        document.getElementById("result").innerHTML = token; 
     }
-
-    // 로그인 성공 → main.html 이동
-    localStorage.setItem("token", text);  // 토큰 저장(옵션)
-    window.location.href = "/index.html";
 }
 </script>
 

@@ -17,8 +17,9 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
 
-
+    // 회원가입
     public String signup(String email, String password) {
+
     if (userRepository.findByEmail(email).isPresent()) {
         return "이미 존재하는 이메일입니다.";
     }
@@ -32,18 +33,17 @@ public class AuthService {
 }
 
 
-public String login(String email, String password) {
-    User user = userRepository.findByEmail(email).orElse(null);
+    // 로그인
+    public String login(String email, String rawPassword) {
 
-    if (user == null)
-        return "존재하지 않는 이메일입니다.";
+        User user = userRepository.findByEmail(email).orElse(null);
 
-    if (!passwordEncoder.matches(password, user.getPassword()))
-        return "비밀번호가 일치하지 않습니다.";
+        if (user == null)
+            return "이메일이 존재하지 않습니다.";
 
-    return jwtUtil.generateToken(email);
-}
+        if (!passwordEncoder.matches(rawPassword, user.getPassword()))
+            return "비밀번호가 일치하지 않습니다.";
 
-    
-
+        return jwtUtil.generateToken(email); // JWT 발급
+    }
 }
