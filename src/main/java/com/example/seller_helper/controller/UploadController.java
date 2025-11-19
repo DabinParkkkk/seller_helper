@@ -76,7 +76,7 @@ public ResponseEntity<InputStreamResource> convert(
             @RequestParam("hanjinFile") MultipartFile hanjinFile)
             throws IOException, InvalidFormatException {
 
-        // 쿠팡 파일은 File 객체로 변환이 필요함c
+        // 쿠팡 파일은 File 객체로 변환이 필요함
         File temp = File.createTempFile("coupang", ".xlsx");
         coupangFile.transferTo(temp);
 
