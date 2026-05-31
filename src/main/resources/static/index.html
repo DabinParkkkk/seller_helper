@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>Seller Helper</title>
+    <style>
+        body { font-family: 'Pretendard', sans-serif; margin: 0; padding: 0; background: #f8f9fa; text-align: center; }
+        .appbar {
+            width: 100%; height: 60px; background: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 20px; position: fixed; top: 0; left: 0; z-index: 999;
+        }
+        .appbar-logo img { height: 35px; }
+        .appbar-menu { display: flex; gap: 16px; align-items: center; }
+        .appbar-menu a { font-size: 15px; text-decoration: none; color: #444; font-weight: 600; }
+        .content-wrap { margin-top: 100px; }
+        .logo-area img { height: 130px; }
+        h1 { font-size: 32px; font-weight: 700; margin-top: 10px; margin-bottom: 10px; color: #222; }
+        .upload-box {
+            margin: 30px auto; background: white; width: 420px;
+            padding: 40px 25px; border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.06);
+        }
+        select, input[type="file"], button {
+            font-size: 15px; padding: 10px; border-radius: 10px;
+            border: 1px solid #ccc; margin: 7px 0; width: 90%;
+        }
+        #uploadBtn { background: #f6d860; border: none; color: #333; font-weight: 600; cursor: pointer; }
+        #uploadBtn:hover { background: #e6c850; }
+        #custom-box {
+            margin-top: 20px; background: #fefefe; padding: 15px;
+            border-radius: 12px; border: 1px solid #ddd; display: none;
+        }
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+        table td { padding: 6px; text-align: left; }
+        table input { width: 100%; padding: 6px; border-radius: 8px; border: 1px solid #bbb; }
+        #saveBtn {
+            margin-top: 10px; background: #9ad0ff; border: none;
+            padding: 10px; font-weight: 600; cursor: pointer;
+            width: 100%; border-radius: 10px;
+        }
+        .onboarding {
+            margin: 0 auto 20px; width: 420px;
+            background: #fffbea; border: 1px solid #f6d860;
+            border-radius: 16px; padding: 20px 25px; text-align: left;
+        }
+        .onboarding h3 { font-size: 15px; font-weight: 700; margin: 0 0 12px; color: #333; }
+        .onboarding ol { margin: 0; padding-left: 20px; color: #555; font-size: 14px; line-height: 2; }
+        .onboarding .tip {
+            margin-top: 12px; font-size: 12px; color: #888;
+            background: #fff; border-radius: 8px; padding: 8px 12px; border: 1px solid #eee;
+        }
+    </style>
+</head>
+<body>
+
+<div class="appbar">
+    <div class="appbar-logo"><img src="/images/logo.png" alt="logo"></div>
+    <div class="appbar-menu" id="menu-area"></div>
+</div>
+
+<div class="content-wrap">
+    <div class="logo-area"><img src="/images/logo.png" alt="SellerHP 로고"></div>
+    <h1>운송장 정리를 더 쉽게 도와드릴게요</h1>
+
+    <div class="onboarding">
+        <h3>📋 이렇게 사용하세요</h3>
+        <ol>
+            <li>쿠팡 판매자센터 → 발주서 엑셀 다운로드</li>
+            <li>택배사 선택 후 파일 업로드</li>
+            <li>변환하기 클릭 → 한진 양식 파일 + 정렬된 쿠팡 파일 2개 다운로드</li>
+            <li>한진 파일 → 한진 사이트에 업로드 후 출력</li>
+            <li>정렬된 쿠팡 파일 → 운송장 대량 등록 페이지에서 사용</li>
+        </ol>
+        <div class="tip">
+            💡 사용자 설정을 선택하면 직접 컬럼을 지정해서 다른 쇼핑몰 파일도 변환할 수 있어요. (로그인 후 설정 저장 가능)
+        </div>
+    </div>
+
+    <div class="upload-box">
+        <label>택배사를 선택해주세요</label><br>
+
+        <select id="courier">
+            <option value="hanjin">한진택배</option>
+            <option value="custom">사용자 설정</option>
+        </select>
+
+        <div id="custom-box">
+            <table>
+                <tr><td>수하인명</td><td><input id="nameCol"></td></tr>
+                <tr><td>연락처</td><td><input id="phoneCol"></td></tr>
+                <tr><td>우편번호</td><td><input id="postcodeCol"></td></tr>
+                <tr><td>주소</td><td><input id="addressCol"></td></tr>
+                <tr><td>수량</td><td><input id="qtyCol"></td></tr>
+                <tr><td>상품명</td><td><input id="productCol"></td></tr>
+                <tr><td>요청사항</td><td><input id="requestCol"></td></tr>
+            </table>
+            <button id="saveBtn">설정 저장</button>
+        </div>
+
+        <br>
+        <input type="file" id="fileInput" accept=".xlsx,.xls" />
+        <button id="uploadBtn">변환하기</button>
+        <div id="status">📂 파일을 선택해주세요</div>
+    </div>
+
+    <div class="sub-link">
+        쿠팡 사이트로 대량 운송장 등록이 필요하다면
+        <a href="/register.html">눌러주세요</a>
+    </div>
+</div>
+
+<script>
+    function renderMenu() {
+        const token = localStorage.getItem("token");
+        const menu = document.getElementById("menu-area");
+        if (token) {
+            menu.innerHTML = `
+                <span style="color:#444; font-weight:600;">로그인됨</span>
+                <a href="#" onclick="logout()">로그아웃</a>
+            `;
+        } else {
+            menu.innerHTML = `
+                <a href="/signup.html">회원가입</a>
+                <a href="/login.html">로그인</a>
+            `;
+        }
+    }
+
+    function logout() { localStorage.removeItem("token"); renderMenu(); }
+
+    window.onload = () => {
+        renderMenu();
+        loadUserMapping();
+    };
+
+    document.getElementById("courier").addEventListener("change", e => {
+        const box = document.getElementById("custom-box");
+        box.style.display = (e.target.value === "custom") ? "block" : "none";
+    });
+
+    async function loadUserMapping() {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch("/mapping/load", {
+            headers: { "Authorization": "Bearer " + token }
+        });
+        if (res.ok) {
+            const data = await res.json();
+            if (data) {
+                document.getElementById("nameCol").value = data.nameCol ?? "";
+                document.getElementById("phoneCol").value = data.phoneCol ?? "";
+                document.getElementById("postcodeCol").value = data.postcodeCol ?? "";
+                document.getElementById("addressCol").value = data.addressCol ?? "";
+                document.getElementById("qtyCol").value = data.qtyCol ?? "";
+                document.getElementById("productCol").value = data.productCol ?? "";
+                document.getElementById("requestCol").value = data.requestCol ?? "";
+            }
+        }
+    }
+
+    document.getElementById("saveBtn").onclick = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) { alert("로그인이 필요합니다"); return; }
+
+        const body = {
+            nameCol: document.getElementById("nameCol").value,
+            phoneCol: document.getElementById("phoneCol").value,
+            postcodeCol: document.getElementById("postcodeCol").value,
+            addressCol: document.getElementById("addressCol").value,
+            qtyCol: document.getElementById("qtyCol").value,
+            productCol: document.getElementById("productCol").value,
+            requestCol: document.getElementById("requestCol").value
+        };
+
+        const res = await fetch("/mapping/save", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+            body: JSON.stringify(body)
+        });
+
+        if (res.ok) alert("저장 완료!");
+        else alert("저장 실패! 로그인 상태를 확인해주세요.");
+    };
+
+    document.getElementById("uploadBtn").onclick = async () => {
+        const courier = document.getElementById("courier").value;
+        const file = document.getElementById("fileInput").files[0];
+
+        if (!file) { alert("파일을 선택해주세요!"); return; }
+
+        document.getElementById("status").innerText = "⏳ 변환 중...";
+
+        let mappingJson = null;
+        if (courier === "custom") {
+            const mapping = {
+                name: document.getElementById("nameCol").value,
+                phone: document.getElementById("phoneCol").value,
+                postcode: document.getElementById("postcodeCol").value,
+                address: document.getElementById("addressCol").value,
+                qty: document.getElementById("qtyCol").value,
+                product: document.getElementById("productCol").value,
+                request: document.getElementById("requestCol").value
+            };
+            mappingJson = JSON.stringify(mapping);
+        }
+
+        // 엔드포인트 설정
+        const mainUrl = courier === "hanjin" ? "/excel/hanjin" : "/excel/custom";
+        const sortedUrl = courier === "hanjin" ? "/excel/hanjin/coupang-sorted" : "/excel/custom/coupang-sorted";
+        const mainName = courier === "hanjin" ? "hanjin.xlsx" : "custom_output.xlsx";
+
+        // 첫 번째 파일 다운로드 (한진 or 커스텀 양식)
+        const formData1 = new FormData();
+        formData1.append("file", file);
+        if (mappingJson) formData1.append("mappingJson", mappingJson);
+
+        const res1 = await fetch(mainUrl, { method: "POST", body: formData1 });
+        if (!res1.ok) { document.getElementById("status").innerText = "❌ 변환 실패!"; return; }
+        const blob1 = await res1.blob();
+        const a1 = document.createElement("a");
+        a1.href = window.URL.createObjectURL(blob1);
+        a1.download = mainName;
+        a1.click();
+
+        // 잠깐 대기
+        await new Promise(r => setTimeout(r, 500));
+
+        // 두 번째 파일 다운로드 (정렬된 쿠팡 파일)
+        const formData2 = new FormData();
+        formData2.append("file", file);
+        if (mappingJson) formData2.append("mappingJson", mappingJson);
+
+        const res2 = await fetch(sortedUrl, { method: "POST", body: formData2 });
+        if (!res2.ok) { document.getElementById("status").innerText = "❌ 쿠팡 파일 변환 실패!"; return; }
+        const blob2 = await res2.blob();
+        const a2 = document.createElement("a");
+        a2.href = window.URL.createObjectURL(blob2);
+        a2.download = "coupang_sorted.xlsx";
+        a2.click();
+
+        document.getElementById("status").innerText = "✅ 변환 완료! 2개 파일이 다운로드됩니다.";
+    };
+</script>
+</body>
+</html>

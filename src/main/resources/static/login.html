@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<title>로그인</title>
+<style>
+    body { font-family: 'Pretendard'; background: #f8f9fa; text-align:center; }
+    .box {
+        width: 350px; margin: 120px auto; background: white;
+        padding: 30px; border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.07);
+    }
+    input, button {
+        width: 80%; padding: 12px; margin-top: 10px;
+        border-radius: 10px; border:1px solid #ccc;
+    }
+    button { background:#ffd84d; border:none; font-weight:600; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="box">
+    <h2>로그인</h2>
+    <input id="id" placeholder="아이디(이메일)">
+    <input id="pw" type="password" placeholder="비밀번호">
+    <button onclick="login()">로그인</button>
+    <p id="result"></p>
+</div>
+
+<script>
+async function login(){
+    const email = document.getElementById("id").value;
+    const password = document.getElementById("pw").value;
+
+    const res = await fetch("/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password })
+    });
+
+    const token = await res.text();
+
+    if (token.startsWith("ey")) { // JWT 토큰 여부
+        localStorage.setItem("token", token);  // 로그인 상태 저장
+        window.location.href = "/index.html";  // 메인으로 이동
+    } else {
+        document.getElementById("result").innerHTML = token; 
+    }
+}
+</script>
+
+</body>
+</html>
