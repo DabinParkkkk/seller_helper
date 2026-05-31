@@ -37,13 +37,13 @@ async function login(){
         body: JSON.stringify({ email, password })
     });
 
-    const token = await res.text();
+    const body = await res.json();
 
-    if (token.startsWith("ey")) { // JWT 토큰 여부
-        localStorage.setItem("token", token);  // 로그인 상태 저장
-        window.location.href = "/index.html";  // 메인으로 이동
+    if (body.success && body.data) {
+        localStorage.setItem("token", body.data);
+        window.location.href = "/index.html";
     } else {
-        document.getElementById("result").innerHTML = token; 
+        document.getElementById("result").innerHTML = body.message;
     }
 }
 </script>

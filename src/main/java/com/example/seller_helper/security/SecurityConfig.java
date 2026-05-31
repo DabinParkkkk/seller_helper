@@ -31,6 +31,7 @@ public class SecurityConfig {
                                 "/", "/index.html",
                                 "/signup.html", "/login.html", "/register.html",
                                 "/auth/**",
+                                "/excel/**", "/match/**",
                                 "/css/**", "/js/**", "/images/**",
                                 "/swagger-ui/**", "/v3/api-docs/**"
                         ).permitAll()
